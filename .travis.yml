@@ -6,6 +6,7 @@ before_install:
   - composer self-update
 
 before_script:
+  - composer require
   - composer install
 
 script: phpunit --configuration phpunit.xml --coverage-text
