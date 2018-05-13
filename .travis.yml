@@ -9,6 +9,7 @@ before_script:
   - composer require
   - composer install
 
-script: php ./src/taskrunner.php
-script: php ./src/taskrunner.php --help
-script: php ./src/taskrunner.php my
+script:
+    - php ./src/taskrunner.php
+    - php ./src/taskrunner.php --help
+    - php ./src/taskrunner.php my
