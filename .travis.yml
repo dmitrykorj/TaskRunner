@@ -13,3 +13,4 @@ script:
     - php ./src/bin/taskrunner.php
     - php ./src/bin/taskrunner.php --help
     - php ./src/bin/taskrunner.php my
+    - php ./src/bin/taskrunner.php cxzcxz

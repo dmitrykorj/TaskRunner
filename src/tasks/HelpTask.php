@@ -6,6 +6,6 @@ class HelpTask
 {
 
     public function action() {
-        echo "Подключился хэлп";
+        echo "Подключился HelpTask\n";
     }
 }
