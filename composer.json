@@ -1,0 +1,13 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "dmitrykorj\\Taskrunner\\": "src",
+            "dmitrykorj\\Taskrunner\\tasks\\": "src/tasks/",
+            "dmitrykorj\\Taskrunner\\tests\\": "tests/"
+        }
+    }
+}

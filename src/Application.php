@@ -1,5 +1,9 @@
 <?php
 
+namespace dmitrykorj\Taskrunner;
+
+use dmitrykorj\Taskrunner\tasks\HelpTask;
+
 class Application {
 
       private static $_instance;
@@ -16,19 +20,17 @@ class Application {
 
       public function run() {
           if($this->getArgs() == false) {
-            require_once TASKSPATH . 'HelpTask.php';
             $defaultTask = new HelpTask();
             $defaultTask->action();
           }
           else {
              $taskname = ucfirst($this->getArgs()).'Task';
-             require_once TASKSPATH . $taskname.'.php';
              $defaultTask = new $taskname();
              $defaultTask->action();
           }
       }
 
-      public function getArgs() {
+      public function parseArgs($args = null) {
           $args = $_SERVER['argv'];
             if (isset($args[1])) {
                 return $this->fixName($args[1]);
