@@ -5,9 +5,7 @@
 
     "autoload": {
         "psr-4": {
-            "dmitrykorj\\Taskrunner\\": "src",
-            "dmitrykorj\\Taskrunner\\tasks\\": "src/tasks/",
-            "dmitrykorj\\Taskrunner\\tests\\": "tests/"
+            "dmitrykorj\\Taskrunner\\": "src/"
         }
     }
 }

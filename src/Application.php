@@ -2,11 +2,10 @@
 
 namespace dmitrykorj\Taskrunner;
 
-use dmitrykorj\Taskrunner\tasks\HelpTask;
-
 class Application {
-
       private static $_instance;
+
+      private $defaultTask = 'help';
 
       public static function getInstance()
       {
@@ -19,23 +18,17 @@ class Application {
       }
 
       public function run() {
-          if($this->getArgs() == false) {
-            $defaultTask = new HelpTask();
-            $defaultTask->action();
-          }
-          else {
-             $taskname = ucfirst($this->getArgs()).'Task';
-             $defaultTask = new $taskname();
-             $defaultTask->action();
-          }
+              $taskname = ucfirst($this->parseArgs().'Task');
+              $class = __NAMESPACE__ . '\\tasks\\' . $taskname;
+              $defaultTask = new $class;
+              $defaultTask->action();
       }
 
       public function parseArgs($args = null) {
-          $args = $_SERVER['argv'];
-            if (isset($args[1])) {
-                return $this->fixName($args[1]);
+            if ($args == null) {
+                $args = $this->defaultTask;
+                return $args;
             }
-           return false;
       }
 
       private function fixName($var) {

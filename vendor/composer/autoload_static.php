@@ -17,8 +17,6 @@ class ComposerStaticInitad40c2ce5eb579ad2c40c4433d15a6a3
         ),
         'd' => 
         array (
-            'dmitrykorj\\Taskrunner\\tests\\' => 28,
-            'dmitrykorj\\Taskrunner\\tasks\\' => 28,
             'dmitrykorj\\Taskrunner\\' => 22,
         ),
         'W' => 
@@ -38,14 +36,6 @@ class ComposerStaticInitad40c2ce5eb579ad2c40c4433d15a6a3
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
             1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
-        ),
-        'dmitrykorj\\Taskrunner\\tests\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/tests',
-        ),
-        'dmitrykorj\\Taskrunner\\tasks\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src/tasks',
         ),
         'dmitrykorj\\Taskrunner\\' => 
         array (
