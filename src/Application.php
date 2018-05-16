@@ -6,9 +6,13 @@ class Application
 {
     const TASKPATH = '/tasks/';
 
+    const TASK_FILENAME_SUFFIX = 'Task.php';
+
     private static $_instance;
 
     private $defaultTask = 'help';
+
+    private $_registeredTasks = [];
 
     public static function getInstance()
     {
@@ -17,6 +21,24 @@ class Application
         }
 
         return self::$_instance;
+    }
+
+    public function registerTasks()
+    {
+        $directoryIterator = new \DirectoryIterator(__DIR__ . '/tasks');
+        while($directoryIterator->valid()) {
+            $file = $directoryIterator->current();
+            $this->_registeredTasks[] = $file->getFilename();
+            $directoryIterator->next();
+        }
+        var_dump($this->_registeredTasks);
+        //$this->_registeredTasks['help'] = __NAMESPACE__ . '/tasks/' . $fileName;
+        //$this->addTask('help', )
+    }
+
+    public function addTask($id, $className)
+    {
+        $this->_registeredTasks[$id] = $className;
     }
 
     public function run()
@@ -38,7 +60,7 @@ class Application
 
         array_shift($args);
 
-        if (!empty($args)) {
+        if (!empty($args) && count($args) == 1) {
             return $args[0];
         }
 
