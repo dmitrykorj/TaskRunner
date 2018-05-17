@@ -4,19 +4,17 @@ namespace dmitrykorj\Taskrunner;
 
 class Application
 {
-    const TASKPATH = '/tasks/';
-
     const TASK_FILENAME_SUFFIX = 'Task.php';
 
     private static $_instance;
 
-    private $defaultTask = 'help';
+    private $defaultTask = 'Help';
 
     private $_registeredTasks = [];
 
     public static function getInstance()
     {
-        if (self::$_instance === null) {
+        if (null === self::$_instance) {
             self::$_instance = new self();
         }
 
@@ -26,29 +24,27 @@ class Application
     public function registerTasks()
     {
         $directoryIterator = new \DirectoryIterator(__DIR__ . '/tasks');
-        while($directoryIterator->valid()) {
-            $file = $directoryIterator->current();
-            $this->_registeredTasks[] = $file->getFilename();
-            $directoryIterator->next();
+        foreach ($directoryIterator as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $fileinfo->current();
+                $fileName = $fileinfo->getFilename();
+                $className = __NAMESPACE__ . '\\tasks\\' . preg_replace('/.php/','',$fileinfo->getFilename());
+                $this->addTask($fileName, $className);
+            }
         }
-        var_dump($this->_registeredTasks);
-        //$this->_registeredTasks['help'] = __NAMESPACE__ . '/tasks/' . $fileName;
-        //$this->addTask('help', )
     }
 
-    public function addTask($id, $className)
+    public function addTask($id,$className)
     {
         $this->_registeredTasks[$id] = $className;
     }
 
     public function run()
     {
-        $taskname = ucfirst($this->parseArgs()) . 'Task';
-        $class = __NAMESPACE__ . '\\tasks\\' . ucfirst($this->fixName($taskname));
-        if ($task = $this->createInstance($class)){
+        $this->registerTasks();
+        if ($task = $this->createInstance($this->getClassNameFromArgs())){
             $task->action();
         }
-
     }
 
     private function parseArgs($args = null)
@@ -59,7 +55,6 @@ class Application
         }
 
         array_shift($args);
-
         if (!empty($args) && count($args) == 1) {
             return $args[0];
         }
@@ -68,18 +63,25 @@ class Application
 
     }
 
-    private function fixName($var) {
+    private function fixName($name) {
 
-        return preg_replace("/-/", '', $var);
+        return preg_replace("/-/", '', $name);
     }
 
-    private function createInstance($className) {
-        if(class_exists($className)) {
-            return new $className();
-        }
-        {
-            echo ("Таск не найден\n");
+    private function createInstance($className)
+    {
+        if (array_key_exists($className, $this->_registeredTasks)) {
+            return new $this->_registeredTasks[$className];
+        } else {
+            echo "Таск не найден\n";
             return false;
         }
+    }
+
+    private function getClassNameFromArgs()
+    {
+        $taskname = ucfirst($this->parseArgs()) . self::TASK_FILENAME_SUFFIX;
+        $class = ucfirst($this->fixName($taskname));
+        return $class;
     }
 }
