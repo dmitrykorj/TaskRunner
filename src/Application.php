@@ -29,7 +29,7 @@ class Application
                 $fileinfo->current();
                 $fileName = $fileinfo->getFilename();
                 $className = __NAMESPACE__ . '\\tasks\\' . preg_replace('/.php/','',$fileinfo->getFilename());
-                $this->addTask($fileName, $className);
+                $this->addTask(strtolower(str_replace(self::TASK_FILENAME_SUFFIX, '', $fileName)), $className);
             }
         }
     }
@@ -39,10 +39,13 @@ class Application
         $this->_registeredTasks[$id] = $className;
     }
 
-    public function run()
+    public function run($args = null)
     {
         $this->registerTasks();
-        if ($task = $this->createInstance($this->getClassNameFromArgs())){
+        if (
+            ($task = $this->createInstance($this->parseArgs($args)))
+            && $task instanceof AbstractTask
+        ){
             $task->action();
         }
     }
@@ -63,11 +66,6 @@ class Application
 
     }
 
-    private function fixName($name) {
-
-        return preg_replace("/-/", '', $name);
-    }
-
     private function createInstance($className)
     {
         if (array_key_exists($className, $this->_registeredTasks)) {
@@ -76,12 +74,5 @@ class Application
             echo "Таск не найден\n";
             return false;
         }
-    }
-
-    private function getClassNameFromArgs()
-    {
-        $taskname = ucfirst($this->parseArgs()) . self::TASK_FILENAME_SUFFIX;
-        $class = ucfirst($this->fixName($taskname));
-        return $class;
     }
 }
