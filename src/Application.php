@@ -14,7 +14,7 @@ class Application
 
     private $_registeredTasks = [];
 
-    public $_namespace = __NAMESPACE__;
+    public static $_namespace = __NAMESPACE__;
 
     public static function getInstance()
     {
@@ -51,9 +51,6 @@ class Application
             && $task instanceof AbstractTask
         ){
             $task->action();
-
-
-            $this->createCopyFile();
         }
     }
 
@@ -86,31 +83,5 @@ class Application
     private function fixName($name) {
 
         return preg_replace("/-/", '', $name);
-    }
-
-    public function createCopyFile() {
-        $file = __DIR__.'/templates/'.'Template.php';
-        $newfile = __DIR__.'/tasks/'.'Task.php';
-        copy($file, $newfile);
-        $this->replace($newfile);
-    }
-
-    private function replace($file) {
-        $replace = null;
-
-        $replace_array1 = [
-            "{TaskName}",
-            "{NameSpace}",
-        ];
-        $replace_array2 = [
-            'NewFile',
-            $this->_namespace,
-        ];
-
-        for($i = 0; $i < 2; $i++) {
-            $content_file = file_get_contents($file);
-            $replace = str_replace($replace_array1[$i], $replace_array2[$i], $content_file);
-            file_put_contents($file, $replace);
-        }
     }
 }
