@@ -10,7 +10,7 @@ class Application
 
     private static $_instance;
 
-    private $defaultTask = 'Help';
+    public $defaultTask = 'Help';
 
     private $_registeredTasks = [];
 
@@ -21,7 +21,6 @@ class Application
         if (null === self::$_instance) {
             self::$_instance = new self();
         }
-
         return self::$_instance;
     }
 
@@ -54,7 +53,7 @@ class Application
         }
     }
 
-    private function parseArgs($args = null)
+    public function parseArgs($args = null)
     {
 
         if (null === $args) {
@@ -62,11 +61,17 @@ class Application
         }
 
         array_shift($args);
-        if (!empty($args) && count($args) == 1) {
+        if (!empty($args) && count($args) <= 1) {
             return $args[0];
         }
+        //if (!empty($args) && count($args) >= 2) {
+        //    return $args;
+        //}
+        else {
+            return $this->defaultTask;
+        }
 
-        return $this->defaultTask;
+
     }
 
     private function createInstance($className)
@@ -74,14 +79,12 @@ class Application
         if (array_key_exists($className, $this->_registeredTasks)) {
             return new $this->_registeredTasks[$className];
         } else {
-           // echo $this->_registeredTasks[$className];
             echo 'Таск <'. $className .'> не найден'."\n";
             return false;
         }
     }
 
     private function fixName($name) {
-
         return preg_replace("/-/", '', $name);
     }
 }

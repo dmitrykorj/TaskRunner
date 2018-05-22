@@ -10,15 +10,20 @@ use dmitrykorj\Taskrunner\Application;
 class addTask extends AbstractTask
 {
     public function action() {
-        $file = __DIR__.'/templates/'.'Template.php';
-        $newfile = __DIR__.'/tasks/'.'Task.php';
-        copy($file, $newfile);
-        $this->replace($newfile);
+        //$app = new Application();
+        //$args = $app->parseArgs();
+        if (!file_exists(__DIR__ . '/../tasks/'.'Task.php')) {
+            $file = __DIR__ . '/../templates/' . 'Template.php';
+            $newfile = __DIR__ . '/../tasks/' . 'Task.php';
+            copy($file, $newfile);
+            $this->replace($newfile);
+        }
+        else {
+            throw new \Exception("Файл $file уже существует!");
+        }
     }
 
     public function replace($file) {
-        $replace = null;
-
         $replace_array1 = [
             "{TaskName}",
             "{NameSpace}",
