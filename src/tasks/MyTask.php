@@ -2,7 +2,7 @@
 
 namespace dmitrykorj\Taskrunner\tasks;
 
-class MyTask
+class MyTask extends AbstractTask
 {
 
     public function action() {

@@ -1,11 +1,9 @@
 <?php
 
-namespace {NameSpace}/tasks;
+namespace {NameSpace}\tasks;
 
 /**
- * Class TaskName
- * strtr
- * str_replacekk
+ * Class {TaskName}
  */
 class {TaskName}Task extends AbstractTask
 {

@@ -2,10 +2,10 @@
 
 namespace dmitrykorj\Taskrunner\tasks;
 
-class TestTask
+class TestTask extends AbstractTask
 {
 
     public function action() {
-        echo "Подключился MyTask\n";
+        echo "Подключился TestTask\n";
     }
 }
