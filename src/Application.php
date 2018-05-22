@@ -95,18 +95,22 @@ class Application
         $this->replace($newfile);
     }
 
-    public function replace($file) {
+    private function replace($file) {
         $replace = null;
-        $a = file_get_contents($file);
 
-        $replace_array1 = ["{NameSpace}", "{TaskName}"];
-        $replace_array2 = [$this->_namespace, 'NewFile'];
+        $replace_array1 = [
+            "{TaskName}",
+            "{NameSpace}",
+        ];
+        $replace_array2 = [
+            'NewFile',
+            $this->_namespace,
+        ];
 
         for($i = 0; $i < 2; $i++) {
-            $replace = str_replace($replace_array1[$i], $replace_array2[$i], $a);
-            //$replace = str_replace("{NameSpace}",$this->_namespace, $a);
+            $content_file = file_get_contents($file);
+            $replace = str_replace($replace_array1[$i], $replace_array2[$i], $content_file);
+            file_put_contents($file, $replace);
         }
-
-        file_put_contents($file,$replace);
     }
 }
