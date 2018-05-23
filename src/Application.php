@@ -18,7 +18,8 @@ class Application
 
     public static function getInstance()
     {
-        if (null === self::$_instance) {
+        if (null === self::$_instance)
+        {
             self::$_instance = new self();
         }
         return self::$_instance;
@@ -27,8 +28,10 @@ class Application
     public function registerTasks()
     {
         $directoryIterator = new \DirectoryIterator(__DIR__ . '/tasks');
-        foreach ($directoryIterator as $fileinfo) {
-            if (!$fileinfo->isDot()) {
+        foreach ($directoryIterator as $fileinfo)
+        {
+            if (!$fileinfo->isDot())
+            {
                 $fileinfo->current();
                 $fileName = $fileinfo->getFilename();
                 $className = __NAMESPACE__ . '\\tasks\\' . preg_replace('/.php/','', $fileinfo->getFilename());
@@ -45,45 +48,74 @@ class Application
     public function run($args = null)
     {
         $this->registerTasks();
-        list($route, $params) = $this->parseArgs($args);
-        if (
-            ($task = $this->createInstance((strtolower($route))))
-            && $task instanceof AbstractTask
-        ){
-            $task->action($params);
-        }
+        $this->hzkaknazvat($args);
     }
 
     public function parseArgs($args = null)
     {
 
-        if (null === $args) {
+        if (null === $args)
+        {
             $args = $_SERVER['argv'];
         }
 
-        array_shift($args);
-        $args = array_values($args);
+        $this->reduceReturn($args);
+
         $taskName = array_shift($args);
         $args = array_values($args);
-        if ($taskName) {
+
+        if ($taskName)
+        {
             return [$taskName, $args];
-        } else {
+
+        }
+        else
+        {
             return [$this->defaultTask, null];
         }
     }
 
-    public function reduceReturn($array)
+    public function reduceReturn(&$array)
     {
-
+        array_shift($array);
+        $array = array_values($array);
     }
 
     private function createInstance($className)
     {
-        if (array_key_exists($className, $this->_registeredTasks)) {
+        if (array_key_exists($className, $this->_registeredTasks))
+        {
             return new $this->_registeredTasks[$className];
-        } else {
+        }
+        else
+        {
             print_r('Таск <'. $className .'> не найден'."\n");
             return false;
+        }
+    }
+
+    private function hzkaknazvat($args) // Название
+    {
+        list($route, $params) = $this->parseArgs($args);
+        if (($task = $this->createInstance((strtolower($route))))
+            && $task instanceof AbstractTask)
+        {
+            if (!empty($params))
+            {
+                $method = method_exists($task, ($params[0]));
+                    if ($method)
+                    {
+                        $task->{$params[0]}();
+                    }
+                    else
+                    {
+                        $task->action($params);
+                    }
+            }
+            else
+            {
+                $task->action($params);
+            }
         }
     }
 }
