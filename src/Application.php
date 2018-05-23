@@ -45,11 +45,12 @@ class Application
     public function run($args = null)
     {
         $this->registerTasks();
+        list($route, $params) = $this->parseArgs($args);
         if (
-            ($task = $this->createInstance((strtolower($this->fixName($this->parseArgs($args))))))
+            ($task = $this->createInstance((strtolower($route))))
             && $task instanceof AbstractTask
         ){
-            $task->action();
+            $task->action($params);
         }
     }
 
@@ -61,16 +62,18 @@ class Application
         }
 
         array_shift($args);
-        if (!empty($args) && count($args) <= 1) {
-            return $args[0];
+        $args = array_values($args);
+        $taskName = array_shift($args);
+        $args = array_values($args);
+        if ($taskName) {
+            return [$taskName, $args];
+        } else {
+            return [$this->defaultTask, null];
         }
-        //if (!empty($args) && count($args) >= 2) {
-        //    return $args;
-        //}
-        else {
-            return $this->defaultTask;
-        }
+    }
 
+    public function reduceReturn($array)
+    {
 
     }
 
@@ -79,12 +82,8 @@ class Application
         if (array_key_exists($className, $this->_registeredTasks)) {
             return new $this->_registeredTasks[$className];
         } else {
-            echo 'Таск <'. $className .'> не найден'."\n";
+            print_r('Таск <'. $className .'> не найден'."\n");
             return false;
         }
-    }
-
-    private function fixName($name) {
-        return preg_replace("/-/", '', $name);
     }
 }

@@ -7,7 +7,7 @@ use dmitrykorj\Taskrunner\Application;
 /**
  * Class Add
  */
-class addTask extends AbstractTask
+class AddTask extends AbstractTask
 {
     public function action() {
         //$app = new Application();
