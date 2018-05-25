@@ -2,7 +2,7 @@
 
 namespace dmitrykorj\Taskrunner\tasks;
 
-class AbstractTask
+abstract class AbstractTask
 {
-
+    abstract protected function actionMain();
 }

@@ -48,9 +48,19 @@ class Application
     public function run($args = null)
     {
         $this->registerTasks();
-        $this->hzkaknazvat($args);
+        try {
+            $this->resolveTask($args);
+            exit(0);
+        } catch (Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            exit(1);
+        }
     }
 
+    /**
+     * @param null $args
+     * @return array
+     */
     public function parseArgs($args = null)
     {
 
@@ -59,33 +69,40 @@ class Application
             $args = $_SERVER['argv'];
         }
 
-        $this->reduceReturn($args);
+        Helper::arrayShift($args);
+        $taskName = Helper::arrayShift($args);
 
-        $taskName = array_shift($args);
-        $args = array_values($args);
+        $options = [];
+        $params = [];
+
+        foreach ($args as $arg) {
+            if (strncmp($arg, '--', 2) === 0) {
+                $options[] = substr($arg, 2);
+            } else {
+                $params[] = $arg;
+            }
+        }
 
         if ($taskName)
         {
-            return [$taskName, $args];
-
+            return [$taskName, $params, $options];
         }
         else
         {
-            return [$this->defaultTask, null];
+            return [$this->defaultTask, null, null];
         }
     }
 
-    public function reduceReturn(&$array)
-    {
-        array_shift($array);
-        $array = array_values($array);
-    }
-
-    private function createInstance($className)
+    private function createInstance($className, $options = [])
     {
         if (array_key_exists($className, $this->_registeredTasks))
         {
-            return new $this->_registeredTasks[$className];
+            $object = new $this->_registeredTasks[$className];
+            foreach ($options as $key => $value) {// ["foo=bar"], ["foo" => "bar"]
+                $object->{$key} = $value;
+            }
+
+            return $object;
         }
         else
         {
@@ -94,10 +111,11 @@ class Application
         }
     }
 
-    private function hzkaknazvat($args) // Название
+    private function resolveTask($args) // Название
     {
-        list($route, $params) = $this->parseArgs($args);
-        if (($task = $this->createInstance((strtolower($route))))
+        var_dump(list($route, $params, $options) = $this->parseArgs($args));
+
+        if (($task = $this->createInstance((strtolower($route)), $options))
             && $task instanceof AbstractTask)
         {
             if (!empty($params))
@@ -105,9 +123,9 @@ class Application
                 $method = method_exists($task, ($params[0]));
                     if ($method)
                     {
-                        $task->{$params[0]}();
+                        $task->{$params[0]}($params);
                     }
-                    else
+
                     {
                         $task->action($params);
                     }

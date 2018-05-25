@@ -15,4 +15,8 @@ class MyTask extends AbstractTask
         echo "( ͡° ͜ʖ ͡°)/～✿\n";
     }
 
+    public function actionMain()
+    {
+        echo "( ͡° ͜ʖ ͡°)/～✿\n";
+    }
 }

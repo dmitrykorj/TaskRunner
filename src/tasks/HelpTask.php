@@ -5,7 +5,11 @@ namespace dmitrykorj\Taskrunner\tasks;
 class HelpTask extends AbstractTask
 {
 
-    public function action() {
-        echo "Подключился HelpTask\n";
+    public function actionMain() {
+        print 'HelpTask '.PHP_EOL;
+    }
+
+    public function actionReturn() {
+        print 'return '. PHP_EOL;
     }
 }
