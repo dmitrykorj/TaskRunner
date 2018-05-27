@@ -8,6 +8,8 @@ class Application
 {
     const TASK_FILENAME_SUFFIX = 'Task.php';
 
+    const ACTION = 'action';
+
     private static $_instance;
 
     public $defaultTask = 'Help';
@@ -98,10 +100,11 @@ class Application
         if (array_key_exists($className, $this->_registeredTasks))
         {
             $object = new $this->_registeredTasks[$className];
-            foreach ($options as $key => $value) {// ["foo=bar"], ["foo" => "bar"]
-                $object->{$key} = $value;
+            if(!empty($options)) {
+                foreach ($options as $key => $value) {// ["foo=bar"], ["foo" => "bar"]
+                    $object->{$key} = $value;
+                }
             }
-
             return $object;
         }
         else
@@ -113,26 +116,39 @@ class Application
 
     private function resolveTask($args) // Название
     {
-        var_dump(list($route, $params, $options) = $this->parseArgs($args));
+        list($route[0], $params, $options) = $this->parseArgs($args);
 
-        if (($task = $this->createInstance((strtolower($route)), $options))
+        if (stripos($route[0],':') !== false) {
+            $route = explode(':', $route[0]);
+        }
+
+        if (($task = $this->createInstance(strtolower($route[0]), $options))
             && $task instanceof AbstractTask)
         {
-            if (!empty($params))
+            if (!empty($route[1]))
             {
-                $method = method_exists($task, ($params[0]));
-                    if ($method)
+                $command = method_exists($task, (self::ACTION.$route[1]));
+                    if ($command)
                     {
-                        $task->{$params[0]}($params);
+                        if(!empty($params)) {
+                            $task->{self::ACTION.$route[1]}($params);
+                        }
+                        else {
+                            $task->{self::ACTION.$route[1]}();
+                        }
                     }
+                    if (!$command)
+                    {
+                        throw new Exception('Команды '.$route[1].' не существует');
+                    }
+            }
+            elseif (empty($route[1]) && !empty($params)) {
+                $task->actionMain($params);
 
-                    {
-                        $task->action($params);
-                    }
             }
             else
             {
-                $task->action($params);
+                $task->actionMain();
             }
         }
     }

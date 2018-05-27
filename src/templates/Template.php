@@ -7,5 +7,8 @@ namespace {NameSpace}\tasks;
  */
 class {TaskName}Task extends AbstractTask
 {
-
+    public function actionMain()
+    {
+        echo "Подключился {TaskName}\n";
+    }
 }

@@ -10,10 +10,6 @@ use dmitrykorj\Taskrunner\Exception;
  */
 class AddtaskTask extends AbstractTask
 {
-    public function action($params)
-    {
-
-    }
 
     private function replace($file)
     {
@@ -36,16 +32,6 @@ class AddtaskTask extends AbstractTask
         }
     }
 
-    public function hello($params)
-    {
-        $name = 'default';
-        if(isset($params[1]))
-        {
-            $name = $params[1];
-        }
-        echo "Hello $name \n";
-    }
-
     private function checkArgs($args)
     {
         if(empty($args)) {
@@ -57,8 +43,9 @@ class AddtaskTask extends AbstractTask
         }
     }
 
-    public function actionMain($params)
+    public function actionMain($params = '')
     {
+
         if ($this->checkArgs($params)) {
             $filename = $params;
             if (!empty($filename)) {
@@ -70,14 +57,19 @@ class AddtaskTask extends AbstractTask
                     $this->replace($newfile);
                     if ($copy_procedure) print_r("Файл $filename[0] успешно создан\n");
                 } else {
-                    print_r("File $filename[0] is already exist!\n");
+                    throw new Exception("File $filename[0] is already exist!\n");
                 }
             }
         }
     }
 
-    public function actionHello()
+    public function actionHello($params = '')
     {
-
+        $name = 'default';
+        if(isset($params[0]))
+        {
+            $name = $params[0];
+        }
+        echo "Hello $name \n";
     }
 }

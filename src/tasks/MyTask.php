@@ -5,18 +5,13 @@ namespace dmitrykorj\Taskrunner\tasks;
 class MyTask extends AbstractTask
 {
 
-    public function action()
-    {
-        echo "Подключился MyTask\n";
-    }
-
-    public function info()
+    public function actionInfo()
     {
         echo "( ͡° ͜ʖ ͡°)/～✿\n";
     }
 
     public function actionMain()
     {
-        echo "( ͡° ͜ʖ ͡°)/～✿\n";
+        echo "Подключился MyTask\n";
     }
 }
