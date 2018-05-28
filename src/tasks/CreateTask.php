@@ -8,8 +8,9 @@ use dmitrykorj\Taskrunner\Exception;
 /**
  * Class Add
  */
-class AddtaskTask extends AbstractTask
+class CreateTask extends AbstractTask
 {
+    public $template =  __DIR__ . '/../templates/' . 'Template.php';
 
     private function replace($file)
     {
@@ -24,7 +25,7 @@ class AddtaskTask extends AbstractTask
 
         $file = __DIR__ . '/../tasks/'. ucfirst($file). Application::TASK_FILENAME_SUFFIX;
 
-        for($i = 0; $i < 2; $i++)
+        for ($i = 0; $i < 2; $i++)
         {
             $content_file = file_get_contents($file);
             $replace = str_replace($replace_array1[$i], $replace_array2[$i], $content_file);
@@ -43,33 +44,28 @@ class AddtaskTask extends AbstractTask
         }
     }
 
-    public function actionMain($params = '')
+    public function actionMain($params = '',$options = '')
     {
-
         if ($this->checkArgs($params)) {
             $filename = $params;
+            var_dump($params);
             if (!empty($filename)) {
-                if (!file_exists(__DIR__ . '/../tasks/' . ucfirst($filename[0]) . Application::TASK_FILENAME_SUFFIX)) {
-                    $file = __DIR__ . '/../templates/' . 'Template.php';
-                    $newfile = __DIR__ . '/../tasks/' . ucfirst($filename[0]) . Application::TASK_FILENAME_SUFFIX;
-                    $copy_procedure = copy($file, $newfile);
-                    $newfile = $filename[0];
+                if (!file_exists(__DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX)) {
+
+                    $newfile = __DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
+                    $copy_procedure = copy ($this->template, $newfile);
+                    $newfile = $filename;
                     $this->replace($newfile);
-                    if ($copy_procedure) print_r("Файл $filename[0] успешно создан\n");
+                    if ($copy_procedure) print_r("Файл $filename успешно создан\n");
                 } else {
-                    throw new Exception("File $filename[0] is already exist!\n");
+                    throw new Exception("File $filename is already exist!\n");
                 }
             }
         }
     }
 
-    public function actionHello($params = '')
+    public function actionHello($params, $options)
     {
-        $name = 'default';
-        if(isset($params[0]))
-        {
-            $name = $params[0];
-        }
-        echo "Hello $name \n";
+        var_dump($options);
     }
 }

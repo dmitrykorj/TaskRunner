@@ -4,6 +4,7 @@ namespace dmitrykorj\Taskrunner\tasks;
 
 class MyTask extends AbstractTask
 {
+    public $help = '';
 
     public function actionInfo()
     {

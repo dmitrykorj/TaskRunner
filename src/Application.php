@@ -66,24 +66,32 @@ class Application
     public function parseArgs($args = null)
     {
 
-        if (null === $args)
-        {
+        if (null === $args) {
             $args = $_SERVER['argv'];
         }
 
         Helper::arrayShift($args);
-        $taskName = Helper::arrayShift($args);
 
         $options = [];
         $params = [];
 
         foreach ($args as $arg) {
             if (strncmp($arg, '--', 2) === 0) {
-                $options[] = substr($arg, 2);
+                list($optionKey, $optionValue) = explode('=', substr($arg, 2), 2);
+                if (!array_key_exists($optionKey, $options)) {
+                    $options[$optionKey] = $optionValue;
+                } else {
+                    if (!is_array($options[$optionKey])) {
+                        $options[$optionKey] = [$options[$optionKey]];
+                    }
+                    $options[$optionKey][] = $optionValue;
+                }
             } else {
                 $params[] = $arg;
             }
         }
+
+        $taskName = Helper::arrayShift($params);
 
         if ($taskName)
         {
@@ -101,7 +109,7 @@ class Application
         {
             $object = new $this->_registeredTasks[$className];
             if(!empty($options)) {
-                foreach ($options as $key => $value) {// ["foo=bar"], ["foo" => "bar"]
+                foreach ($options as $key => $value) {
                     $object->{$key} = $value;
                 }
             }
@@ -114,6 +122,10 @@ class Application
         }
     }
 
+    /**
+     * @param $args
+     * @throws Exception
+     */
     private function resolveTask($args) // Название
     {
         list($route[0], $params, $options) = $this->parseArgs($args);
@@ -125,31 +137,15 @@ class Application
         if (($task = $this->createInstance(strtolower($route[0]), $options))
             && $task instanceof AbstractTask)
         {
-            if (!empty($route[1]))
-            {
-                $command = method_exists($task, (self::ACTION.$route[1]));
-                    if ($command)
-                    {
-                        if(!empty($params)) {
-                            $task->{self::ACTION.$route[1]}($params);
-                        }
-                        else {
-                            $task->{self::ACTION.$route[1]}();
-                        }
-                    }
-                    if (!$command)
-                    {
-                        throw new Exception('Команды '.$route[1].' не существует');
-                    }
+            $action = $task->defaultAction;
+            if (!empty($route[1])) {
+                $action = $route[1];
             }
-            elseif (empty($route[1]) && !empty($params)) {
-                $task->actionMain($params);
-
+            $action = ucfirst($action);
+            if (!method_exists($task, self::ACTION . $action)) {
+                throw new Exception("Command {$action} not found.");
             }
-            else
-            {
-                $task->actionMain();
-            }
+            return call_user_func_array([$task, self::ACTION . $action], $params);
         }
     }
 }
