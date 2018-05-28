@@ -10,7 +10,9 @@ use dmitrykorj\Taskrunner\Exception;
  */
 class CreateTask extends AbstractTask
 {
-    public $template =  __DIR__ . '/../templates/' . 'Template.php';
+    protected $template_route = __DIR__ . '/../templates/';
+
+    public $template = 'Template.php';
 
     private function replace($file)
     {
@@ -38,25 +40,29 @@ class CreateTask extends AbstractTask
         if(empty($args)) {
             throw new Exception("Не указано имя файла");
         }
-        elseif (count($args) === 1) return true;
+
+        if (count($args) === 1) return true;
+
         else {
             throw new Exception("Количество аргументов превышает 1");
         }
     }
 
-    public function actionMain($params = '',$options = '')
+    /**
+     * @param string $params
+     * @throws Exception
+     */
+    public function actionMain($params = '')
     {
         if ($this->checkArgs($params)) {
-            $filename = $params;
-            var_dump($params);
+            $filename = $params[0];
             if (!empty($filename)) {
                 if (!file_exists(__DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX)) {
-
                     $newfile = __DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
-                    $copy_procedure = copy ($this->template, $newfile);
+                    $copy_procedure = copy ($this->template_route.$this->template, $newfile);
                     $newfile = $filename;
                     $this->replace($newfile);
-                    if ($copy_procedure) print_r("Файл $filename успешно создан\n");
+                    if ($copy_procedure) throw new Exception("Файл $filename успешно создан\n");
                 } else {
                     throw new Exception("File $filename is already exist!\n");
                 }
@@ -64,8 +70,7 @@ class CreateTask extends AbstractTask
         }
     }
 
-    public function actionHello($params, $options)
-    {
-        var_dump($options);
+    public function info() {
+       echo 'Информация о таске Create';
     }
 }

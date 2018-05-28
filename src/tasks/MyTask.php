@@ -15,4 +15,8 @@ class MyTask extends AbstractTask
     {
         echo "Подключился MyTask\n";
     }
+
+    public function info() {
+        echo ' инфо myTask';
+    }
 }

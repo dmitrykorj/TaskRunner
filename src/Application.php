@@ -12,7 +12,7 @@ class Application
 
     private static $_instance;
 
-    public $defaultTask = 'Help';
+    public $defaultTask = 'help';
 
     private $_registeredTasks = [];
 
@@ -103,6 +103,12 @@ class Application
         }
     }
 
+    /**
+     * @param $className
+     * @param array $options
+     * @return bool
+     * @throws Exception
+     */
     private function createInstance($className, $options = [])
     {
         if (array_key_exists($className, $this->_registeredTasks))
@@ -117,7 +123,7 @@ class Application
         }
         else
         {
-            print_r('Таск <'. $className .'> не найден'."\n");
+            throw new Exception("Task $className isn't found");
             return false;
         }
     }
@@ -141,11 +147,14 @@ class Application
             if (!empty($route[1])) {
                 $action = $route[1];
             }
+
             $action = ucfirst($action);
+
             if (!method_exists($task, self::ACTION . $action)) {
                 throw new Exception("Command {$action} not found.");
             }
-            return call_user_func_array([$task, self::ACTION . $action], $params);
+            return call_user_func([$task, self::ACTION . $action], $params);
+
         }
     }
 }
