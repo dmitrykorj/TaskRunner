@@ -12,11 +12,9 @@ class Application
 
     private static $_instance;
 
-    public $defaultTask = 'help';
+    private $defaultTask = 'help';
 
     private $_registeredTasks = [];
-
-    public static $_namespace = __NAMESPACE__;
 
     public static function getInstance()
     {
@@ -54,12 +52,19 @@ class Application
             $this->resolveTask($args);
             exit(0);
         } catch (Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
+            $this->stdout($e->getMessage());
             exit(1);
         }
     }
 
+    public function stdout($message, $newLine = true)
+    {
+        echo $message . ($newLine ? PHP_EOL : '');
+    }
+
     /**
+     *
+     *
      * @param null $args
      * @return array
      */
@@ -77,7 +82,15 @@ class Application
 
         foreach ($args as $arg) {
             if (strncmp($arg, '--', 2) === 0) {
-                list($optionKey, $optionValue) = explode('=', substr($arg, 2), 2);
+                $optionValue = null;
+                if (strpos($arg, '=') !== false) {
+                    list($optionKey, $optionValue) = explode('=', substr($arg, 2), 2);
+                } else {
+                    $optionKey = substr($arg, 2);
+                }
+                if ($optionValue === null) {
+                    $optionValue = true;
+                }
                 if (!array_key_exists($optionKey, $options)) {
                     $options[$optionKey] = $optionValue;
                 } else {
@@ -90,7 +103,6 @@ class Application
                 $params[] = $arg;
             }
         }
-
         $taskName = Helper::arrayShift($params);
 
         if ($taskName)
@@ -103,17 +115,18 @@ class Application
         }
     }
 
+
     /**
      * @param $className
      * @param array $options
-     * @return bool
+     * @return object
      * @throws Exception
      */
     private function createInstance($className, $options = [])
     {
         if (array_key_exists($className, $this->_registeredTasks))
         {
-            $object = new $this->_registeredTasks[$className];
+            $object = Helper::getClassObject($this->_registeredTasks[$className]);
             if(!empty($options)) {
                 foreach ($options as $key => $value) {
                     $object->{$key} = $value;
@@ -124,25 +137,25 @@ class Application
         else
         {
             throw new Exception("Task $className isn't found");
-            return false;
         }
     }
 
+
     /**
      * @param $args
+     * @return mixed
      * @throws Exception
      */
     private function resolveTask($args) // Название
     {
         list($route[0], $params, $options) = $this->parseArgs($args);
 
-        if (stripos($route[0],':') !== false) {
+        if (stripos($route[0], ':') !== false) {
             $route = explode(':', $route[0]);
         }
 
         if (($task = $this->createInstance(strtolower($route[0]), $options))
-            && $task instanceof AbstractTask)
-        {
+            && $task instanceof AbstractTask) {
             $action = $task->defaultAction;
             if (!empty($route[1])) {
                 $action = $route[1];
@@ -153,8 +166,8 @@ class Application
             if (!method_exists($task, self::ACTION . $action)) {
                 throw new Exception("Command {$action} not found.");
             }
-            return call_user_func([$task, self::ACTION . $action], $params);
 
+            return call_user_func_array([$task, self::ACTION . $action], $params);
         }
     }
 }

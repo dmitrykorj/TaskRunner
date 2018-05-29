@@ -22,7 +22,7 @@ class CreateTask extends AbstractTask
         ];
         $replace_array2 = [
             ucfirst($file),
-            Application::$_namespace,
+            __NAMESPACE__,
         ];
 
         $file = __DIR__ . '/../tasks/'. ucfirst($file). Application::TASK_FILENAME_SUFFIX;
@@ -35,6 +35,11 @@ class CreateTask extends AbstractTask
         }
     }
 
+    /**
+     * @param $args
+     * @return bool
+     * @throws Exception
+     */
     private function checkArgs($args)
     {
         if(empty($args)) {
@@ -55,15 +60,19 @@ class CreateTask extends AbstractTask
     public function actionMain($params = '')
     {
         if ($this->checkArgs($params)) {
-            $filename = $params[0];
+            list($filename) = $params;
             if (!empty($filename)) {
+                if(empty($this->template)) {
+                    throw new Exception("--template can't be empty");
+                }
                 if (!file_exists(__DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX)) {
                     $newfile = __DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
-                    $copy_procedure = copy ($this->template_route.$this->template, $newfile);
+                    $copy_procedure = copy ($this->template_route . $this->template, $newfile);
                     $newfile = $filename;
                     $this->replace($newfile);
                     if ($copy_procedure) throw new Exception("Файл $filename успешно создан\n");
-                } else {
+                }
+                else {
                     throw new Exception("File $filename is already exist!\n");
                 }
             }

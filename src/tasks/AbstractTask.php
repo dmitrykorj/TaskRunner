@@ -10,4 +10,6 @@ abstract class AbstractTask
     public $defaultAction = 'main';
 
     abstract protected function actionMain();
+
+    abstract public function info();
 }

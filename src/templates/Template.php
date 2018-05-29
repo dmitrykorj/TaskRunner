@@ -1,6 +1,6 @@
 <?php
 
-namespace {NameSpace}\tasks;
+namespace {NameSpace};
 
 /**
  * Class {TaskName}
