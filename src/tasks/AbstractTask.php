@@ -11,5 +11,5 @@ abstract class AbstractTask
 
     abstract protected function actionMain();
 
-    abstract public function info();
+    abstract public function getInfoAboutTask();
 }

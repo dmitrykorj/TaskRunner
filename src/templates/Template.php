@@ -11,4 +11,9 @@ class {TaskName}Task extends AbstractTask
     {
         echo "Подключился {TaskName}\n";
     }
+
+    public function info()
+    {
+        echo "Информация о таске {TaskName}\n";
+    }
 }

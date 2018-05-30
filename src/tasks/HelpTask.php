@@ -3,20 +3,25 @@
 namespace dmitrykorj\Taskrunner\tasks;
 
 use dmitrykorj\Taskrunner\Helper;
+use dmitrykorj\Taskrunner\Console;
 
 class HelpTask extends AbstractTask
 {
-    public function actionReturn()
-    {
-        print 'return ' . PHP_EOL;
-    }
-
     public function actionMain($taskName = 'help')
     {
         if (!empty($taskName)) {
             $className = Helper::getTaskClassName($taskName);
             $task = Helper::getClassObject($className);
-            $task->info();
+            $task->getInfoAboutTask();
         }
+        else {
+            $this->getInfoAboutTask();
+        }
+    }
+
+    public function getInfoAboutTask()
+    {
+        $message = 'Info HelpTask';
+        Console::write($message,true);
     }
 }

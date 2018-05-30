@@ -3,6 +3,7 @@
 namespace dmitrykorj\Taskrunner\tasks;
 
 use dmitrykorj\Taskrunner\Application;
+use dmitrykorj\Taskrunner\Console;
 use dmitrykorj\Taskrunner\Exception;
 
 /**
@@ -10,11 +11,14 @@ use dmitrykorj\Taskrunner\Exception;
  */
 class CreateTask extends AbstractTask
 {
-    protected $template_route = __DIR__ . '/../templates/';
+    /**
+     * Путь до дефолтного темплейта.
+     *
+     * @var string
+     */
+    public $template = __DIR__ . '/../templates/Template.php';
 
-    public $template = 'Template.php';
-
-    private function replace($file)
+    private function replaceTemplate($file)
     {
         $replace_array1 = [
             "{TaskName}",
@@ -36,6 +40,8 @@ class CreateTask extends AbstractTask
     }
 
     /**
+     * Проверяет на наличие обязательного аргумента (имени файла).
+     *
      * @param $args
      * @return bool
      * @throws Exception
@@ -54,23 +60,25 @@ class CreateTask extends AbstractTask
     }
 
     /**
+     *
+     *
      * @param string $params
      * @throws Exception
      */
     public function actionMain($params = '')
     {
         if ($this->checkArgs($params)) {
-            list($filename) = $params;
+            $filename = $params;
             if (!empty($filename)) {
                 if(empty($this->template)) {
                     throw new Exception("--template can't be empty");
                 }
                 if (!file_exists(__DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX)) {
                     $newfile = __DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
-                    $copy_procedure = copy ($this->template_route . $this->template, $newfile);
+                    $copy_procedure = copy ($this->template, $newfile);
                     $newfile = $filename;
-                    $this->replace($newfile);
-                    if ($copy_procedure) throw new Exception("Файл $filename успешно создан\n");
+                    $this->replaceTemplate($newfile);
+                    if ($copy_procedure) Console::write("Файл $filename успешно создан\n");
                 }
                 else {
                     throw new Exception("File $filename is already exist!\n");
@@ -79,7 +87,9 @@ class CreateTask extends AbstractTask
         }
     }
 
-    public function info() {
-       echo 'Информация о таске Create';
+    public function getInfoAboutTask() {
+       Console::write('Список доступных команд: ', true);
+       Console::write('create <filename>', true);
+       Console::write("create <filename> --template='PATH'", true);
     }
 }

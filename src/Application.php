@@ -4,6 +4,10 @@ namespace dmitrykorj\Taskrunner;
 
 use dmitrykorj\Taskrunner\tasks\AbstractTask;
 
+/**
+ * Class Application
+ * @package dmitrykorj\Taskrunner
+ */
 class Application
 {
     const TASK_FILENAME_SUFFIX = 'Task.php';
@@ -25,6 +29,9 @@ class Application
         return self::$_instance;
     }
 
+    /**
+     *
+     */
     public function registerTasks()
     {
         $directoryIterator = new \DirectoryIterator(__DIR__ . '/tasks');
@@ -52,7 +59,7 @@ class Application
             $this->resolveTask($args);
             exit(0);
         } catch (Exception $e) {
-            $this->stdout($e->getMessage());
+            Console::write($e->getMessage());
             exit(1);
         }
     }
@@ -111,16 +118,18 @@ class Application
         }
         else
         {
-            return [$this->defaultTask, null, null];
+            return [$this->defaultTask, [], null];
         }
     }
 
 
     /**
+     *
+     *
      * @param $className
      * @param array $options
      * @return object
-     * @throws Exception
+     * @throws \Exception
      */
     private function createInstance($className, $options = [])
     {
@@ -145,11 +154,11 @@ class Application
      * @param $args
      * @return mixed
      * @throws Exception
+     * @throws \Exception
      */
-    private function resolveTask($args) // Название
+    private function resolveTask($args)
     {
         list($route[0], $params, $options) = $this->parseArgs($args);
-
         if (stripos($route[0], ':') !== false) {
             $route = explode(':', $route[0]);
         }
@@ -166,8 +175,7 @@ class Application
             if (!method_exists($task, self::ACTION . $action)) {
                 throw new Exception("Command {$action} not found.");
             }
-
-            return call_user_func_array([$task, self::ACTION . $action], $params);
         }
+        return call_user_func_array([$task, self::ACTION . $action], $params);
     }
 }
