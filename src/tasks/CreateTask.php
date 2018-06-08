@@ -18,6 +18,11 @@ class CreateTask extends AbstractTask
      */
     public $template = __DIR__ . '/../templates/Template.php';
 
+    /**
+     * Заменяет namespace и название класса в соответствии с названием файла.
+     *
+     * @param $file
+     */
     private function replaceTemplate($file)
     {
         $replace_array1 = [
@@ -44,7 +49,7 @@ class CreateTask extends AbstractTask
      *
      * @param $args
      * @return bool
-     * @throws Exception
+     * @throws Exception если не указано имя файла или аргументов передано больше чем 1
      */
     private function checkArgs($args)
     {

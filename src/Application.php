@@ -30,7 +30,7 @@ class Application
     }
 
     /**
-     *
+     * Проверяет на наличие доступных тасков в папке "/tasks" и добавляет их в массив
      */
     public function registerTasks()
     {
@@ -47,11 +47,23 @@ class Application
         }
     }
 
-    public function addTask($id,$className)
+    /**
+     * Добавляет таск в массив c доступными тасками.
+     *
+     * @param $id
+     * @param $className
+     */
+    public function addTask($id, $className)
     {
         $this->_registeredTasks[$id] = $className;
     }
 
+    /**
+     * Запуск консольного приложения.
+     *
+     * @param null $args
+     * @throws \Exception
+     */
     public function run($args = null)
     {
         $this->registerTasks();
@@ -64,13 +76,9 @@ class Application
         }
     }
 
-    public function stdout($message, $newLine = true)
-    {
-        echo $message . ($newLine ? PHP_EOL : '');
-    }
-
     /**
-     *
+     * Парсит переданные аргументы.
+     * Возвращает массив с названием таска и переданными опциями и агрументами.
      *
      * @param null $args
      * @return array
@@ -124,7 +132,9 @@ class Application
 
 
     /**
-     *
+     * Проверка на наличие переданного аргумента на наличие в массиве с зарегистированными
+     * тасками.
+     * Возвращает объект класса переданного таска.
      *
      * @param $className
      * @param array $options
@@ -151,6 +161,10 @@ class Application
 
 
     /**
+     * Разбивает первый аргумент при наличии в нем символа ":" на массив
+     * Проверяет на наличие указанного метода.
+     * Возвращает вызор callback функции с указанным классом, экшеном и параметрами.
+     *
      * @param $args
      * @return mixed
      * @throws Exception
