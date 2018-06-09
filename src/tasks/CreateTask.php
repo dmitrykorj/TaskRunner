@@ -12,35 +12,47 @@ use dmitrykorj\Taskrunner\Exception;
 class CreateTask extends AbstractTask
 {
     /**
-     * Путь до дефолтного темплейта.
-     *
-     * @var string
+     * @var string Путь до файла шаблона
      */
-    public $template = __DIR__ . '/../templates/Template.php';
+    public $template;
+
+    public function getDefaultReplaceParams($file)
+    {
+        $params =
+            [
+                [
+                    "{TaskName}",
+                    "{NameSpace}",
+                ],
+                [
+                    ucfirst($file),
+                    __NAMESPACE__,
+                ],
+            ];
+        return $params;
+    }
+
+    public function getFileNamePath($file)
+    {
+        return $file = parent::TASKPATH . ucfirst($file) . Application::TASK_FILENAME_SUFFIX;
+    }
 
     /**
      * Заменяет namespace и название класса в соответствии с названием файла.
      *
      * @param $file
      */
-    private function replaceTemplate($file)
+    private function replaceDefaultTemplate($file)
     {
-        $replace_array1 = [
-            "{TaskName}",
-            "{NameSpace}",
-        ];
-        $replace_array2 = [
-            ucfirst($file),
-            __NAMESPACE__,
-        ];
 
-        $file = __DIR__ . '/../tasks/'. ucfirst($file). Application::TASK_FILENAME_SUFFIX;
+        $params = $this->getDefaultReplaceParams($file);
+        $file = $this->getFileNamePath($file);
 
-        for ($i = 0; $i < 2; $i++)
+        for ($i = 0; $i < count($params); $i++)
         {
-            $content_file = file_get_contents($file);
-            $replace = str_replace($replace_array1[$i], $replace_array2[$i], $content_file);
-            file_put_contents($file, $replace);
+            $contentFile = file_get_contents($file);
+            $newFile = str_replace($params[0][$i], $params[1][$i], $contentFile);
+            file_put_contents($file, $newFile);
         }
     }
 
@@ -53,14 +65,16 @@ class CreateTask extends AbstractTask
      */
     private function checkArgs($args)
     {
-        if(empty($args)) {
+        if (empty($args)) {
             throw new Exception("Не указано имя файла");
         }
 
-        if (count($args) === 1) return true;
-
-        else {
+        if (count($args) > 1) {
             throw new Exception("Количество аргументов превышает 1");
+        }
+
+        if (count($args) === 1) {
+            return true;
         }
     }
 
@@ -72,29 +86,44 @@ class CreateTask extends AbstractTask
      */
     public function actionMain($params = '')
     {
-        if ($this->checkArgs($params)) {
+        if ($this->checkArgs($params))
+        {
             $filename = $params;
-            if (!empty($filename)) {
-                if(empty($this->template)) {
-                    throw new Exception("--template can't be empty");
-                }
-                if (!file_exists(__DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX)) {
-                    $newfile = __DIR__ . '/../tasks/' . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
-                    $copy_procedure = copy ($this->template, $newfile);
-                    $newfile = $filename;
-                    $this->replaceTemplate($newfile);
-                    if ($copy_procedure) Console::write("Файл $filename успешно создан\n");
-                }
-                else {
-                    throw new Exception("File $filename is already exist!\n");
-                }
-            }
+
+            $this->createCopyTemplate($filename);
+
+            $this->replaceDefaultTemplate($filename);
         }
     }
 
-    public function getInfoAboutTask() {
-       Console::write('Список доступных команд: ', true);
-       Console::write('create <filename>', true);
-       Console::write("create <filename> --template='PATH'", true);
+    public function getInfoAboutTask()
+    {
+        Console::write('Список доступных команд: ', true);
+        Console::write('create <filename>', true);
+        Console::write("create <filename> --template='PATH'", true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateFile()
+    {
+        if (!empty($this->template)) {
+            return $this->template;
+        } else {
+            $this->template = __DIR__ . '/../templates/Template.php';
+        }
+        return $this->template;
+    }
+
+    public function createCopyTemplate($filename)
+    {
+        $this->getTemplateFile();
+        $copyProcedure = null;
+        if (!file_exists(parent::TASKPATH . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX))
+        {
+            $newFile = parent::TASKPATH . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
+            copy($this->template, $newFile);
+        }
     }
 }

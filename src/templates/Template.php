@@ -1,6 +1,7 @@
 <?php
+namespace dmitrykorj\Taskrunner\tasks;
 
-namespace {NameSpace};
+use dmitrykorj\Taskrunner\Console;
 
 /**
  * Class {TaskName}
@@ -9,11 +10,11 @@ class {TaskName}Task extends AbstractTask
 {
     public function actionMain()
     {
-        echo "Подключился {TaskName}\n";
+        Console::write('Подключился {TaskName}',true);
     }
 
     public function getInfoAboutTask()
     {
-        echo "Информация о таске {TaskName}\n";
+         Console::write('Информация о таске {TaskName}', true);
     }
 }
