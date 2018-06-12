@@ -35,13 +35,14 @@ class Application
     public function registerTasks()
     {
         $directoryIterator = new \DirectoryIterator(__DIR__ . '/tasks');
-        foreach ($directoryIterator as $fileinfo)
+        foreach ($directoryIterator as $fileInfo)
         {
-            if (!$fileinfo->isDot())
+            if (!$fileInfo->isDot())
             {
-                $fileinfo->current();
-                $fileName = $fileinfo->getFilename();
-                $className = __NAMESPACE__ . '\\tasks\\' . preg_replace('/.php/','', $fileinfo->getFilename());
+                $fileInfo->current();
+                $fileName = $fileInfo->getFilename();
+                $className = __NAMESPACE__ . Helper::NAMESPACE_SEPARATOR . 'tasks' . Helper::NAMESPACE_SEPARATOR .
+                    preg_replace('/.php/','', $fileInfo->getFilename());
                 $this->addTask(strtolower(str_replace(self::TASK_FILENAME_SUFFIX, '', $fileName)), $className);
             }
         }

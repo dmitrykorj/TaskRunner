@@ -8,6 +8,8 @@ namespace dmitrykorj\Taskrunner;
  */
 class Helper
 {
+    const NAMESPACE_SEPARATOR = '\\';
+
     /**
      * @param $array
      * @return mixed
@@ -43,6 +45,6 @@ class Helper
      */
     protected static function getTaskNamespace()
     {
-        return __NAMESPACE__ . '\\tasks\\';
+        return __NAMESPACE__ . self::NAMESPACE_SEPARATOR . 'tasks' . self::NAMESPACE_SEPARATOR;
     }
 }
