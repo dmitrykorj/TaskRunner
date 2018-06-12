@@ -1,5 +1,4 @@
 <?php
-
 namespace dmitrykorj\Taskrunner\tasks;
 
 use dmitrykorj\Taskrunner\Application;
@@ -7,7 +6,7 @@ use dmitrykorj\Taskrunner\Console;
 use dmitrykorj\Taskrunner\Exception;
 
 /**
- * Class Add
+ * Class Create
  */
 class CreateTask extends AbstractTask
 {
@@ -16,25 +15,38 @@ class CreateTask extends AbstractTask
      */
     public $template;
 
-    public function getDefaultReplaceParams($file)
+    public function getDefaultReplaceParams($file, $params = [])
     {
-        $params =
-            [
+        if(empty($params)) {
+            $params =
                 [
-                    "{TaskName}",
-                    "{NameSpace}",
-                ],
-                [
-                    ucfirst($file),
-                    __NAMESPACE__,
-                ],
-            ];
+                    [
+                        "{TaskName}",
+                        "{NameSpace}",
+                    ],
+                    [
+                        ucfirst($file),
+                        __NAMESPACE__,
+                    ],
+                ];
+        }
         return $params;
     }
 
-    public function getFileNamePath($file)
+    /**
+     * Возвращает название файла.
+     *
+     * @param $file
+     * @param bool $taskPath Возвращает PATH вместе с названием файла.
+     * @return string
+     */
+    public function getFileName($file, $taskPath = false)
     {
-        return $file = parent::TASKPATH . ucfirst($file) . Application::TASK_FILENAME_SUFFIX;
+        if ($taskPath)
+        {
+            $file = parent::TASKPATH . ucfirst($file) . Application::TASK_FILENAME_SUFFIX;
+        }
+        return $file;
     }
 
     /**
@@ -44,12 +56,10 @@ class CreateTask extends AbstractTask
      */
     private function replaceDefaultTemplate($file)
     {
-
         $params = $this->getDefaultReplaceParams($file);
-        $file = $this->getFileNamePath($file);
+        $file = $this->getFileName($file, true);
 
-        for ($i = 0; $i < count($params); $i++)
-        {
+        for ($i = 0; $i < count($params); $i++) {
             $contentFile = file_get_contents($file);
             $newFile = str_replace($params[0][$i], $params[1][$i], $contentFile);
             file_put_contents($file, $newFile);
@@ -79,7 +89,8 @@ class CreateTask extends AbstractTask
     }
 
     /**
-     *
+     * Проверяет на обязательный аргумент - название файла.
+     * Создает копию файла шаблона и заменяет их на название переданное в агрументах.
      *
      * @param string $params
      * @throws Exception
@@ -91,7 +102,6 @@ class CreateTask extends AbstractTask
             $filename = $params;
 
             $this->createCopyTemplate($filename);
-
             $this->replaceDefaultTemplate($filename);
         }
     }
@@ -104,26 +114,51 @@ class CreateTask extends AbstractTask
     }
 
     /**
-     * @return string
+     * Проверяет на наличие файла шаблона указанного в переданных аргументах.
+     * Если он существует возвращает путь до шаблона.
+     *
+     * @return string путь до шаблона
+     * @throws Exception если файл шаблона не найден
      */
     public function getTemplateFile()
     {
-        if (!empty($this->template)) {
+        if (!empty($this->template && file_exists($this->template)))
+        {
             return $this->template;
-        } else {
+        }
+        elseif (empty($this->template))
+        {
             $this->template = __DIR__ . '/../templates/Template.php';
         }
+        else {
+             Exception::isTemplateNotFound();
+        }
+
         return $this->template;
     }
 
+    /**
+     * Создает копию шаблона
+     *
+     * @param $filename
+     * @throws Exception если файл уже существует.
+     */
     public function createCopyTemplate($filename)
     {
-        $this->getTemplateFile();
         $copyProcedure = null;
-        if (!file_exists(parent::TASKPATH . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX))
+        $this->getTemplateFile();
+        $file = $this->getFileName($filename);
+
+        if (!file_exists($this->getFileName($file, true)))
         {
-            $newFile = parent::TASKPATH . ucfirst($filename) . Application::TASK_FILENAME_SUFFIX;
-            copy($this->template, $newFile);
+            $copyProcedure = copy($this->template, $this->getFileName($file, true));
+            if ($copyProcedure)
+            {
+                Console::write('Файл '. $file . ' успешно создан.', true);
+            }
         }
+            else {
+                Exception::fileAlreadyExist($file);
+            }
     }
 }

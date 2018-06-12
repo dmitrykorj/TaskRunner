@@ -15,11 +15,7 @@ abstract class AbstractTask
     const TASKPATH = __DIR__ . '/';
 
     /**
-     * @var string
+     * @var string Действие по умолчанию.
      */
     public $defaultAction = 'main';
-
-
-
-
 }

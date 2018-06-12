@@ -16,7 +16,7 @@ class Application
 
     private static $_instance;
 
-    private $defaultTask = 'help';
+    public $defaultTask = 'help';
 
     private $_registeredTasks = [];
 

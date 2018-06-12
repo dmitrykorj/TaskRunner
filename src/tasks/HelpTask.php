@@ -9,7 +9,7 @@ class HelpTask extends AbstractTask
 {
     public function actionMain($taskName = 'help')
     {
-        if (!empty($taskName)) {
+        if (!empty($this->defaultAction)) {
             $className = Helper::getTaskClassName($taskName);
             $task = Helper::getClassObject($className);
             $task->getInfoAboutTask();
